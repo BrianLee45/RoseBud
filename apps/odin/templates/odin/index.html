@@ -5,6 +5,17 @@
   <title>My Appointments Home</title>
   {% load staticfiles %}
   <link rel="stylesheet" href=" {% static 'odin/css/master.css' %} ">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $("#datePicker").datepicker({
+        dateFormat: "yy-mm-dd"
+      });
+    });
+
+  </script>
   <!-- <link rel="stylesheet" href="../static/css/master.css"> -->
 </head>
 <body>
@@ -23,8 +34,9 @@
       {% endfor %}
     {% endif %}
     <section id="currentAppts">
-      <h2>Here Are Your Appointments for *DATE*</h2>
-      {% if events %}
+      {% if today %}
+      <h2>Here Are Your Appointments for {{today}}</h2>
+      {% endif %}
           <table>
             <thead>
               <td>Tasks</td>
@@ -33,22 +45,44 @@
               <td>Action</td>
             </thead>
             <tbody>
+              {% if events %}
               {% for event in events %}
               <tr>
                 <td>{{event.task}}</td>
-                <td>{{event.time}}</td>
+                <td>{{event.eventTime}}</td>
                 <td>{{event.status}}</td>
-                <td>Edit | Delete</td>
+                <td>
+                  {% if event.status != 'Done' %}
+                  <a href="{% url 'odin:showUpdate' event.id %}">Edit</a> | <a href="{% url 'odin:doDelete' event.id %}">Delete</a>
+                  {% endif %}
+                </td>
               </tr>
               {% endfor %}
+              {% endif %}
             </tbody>
           </table>
-      {% endif %}
-
     </section>
+
     <section id="futureAppts">
       <h2>Your Other Appointments</h2>
-
+      <table>
+        <thead>
+          <td>Tasks</td>
+          <td>Date</td>
+          <td>Time</td>
+        </thead>
+        <tbody>
+          {% if future %}
+          {% for event in future %}
+          <tr>
+            <td>{{event.task}}</td>
+            <td>{{event.eventDate}}</td>
+            <td>{{event.eventTime}}</td>
+          </tr>
+          {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
     </section>
 
     <section id="createAppt">
@@ -60,13 +94,19 @@
           <td>Task Name:</td><td><input type="text" name="task" placeholder="Appointment name"></td>
         </tr>
         <tr>
-          <td>Date:</td><td><input type="text" name="eventDate" placeholder="YYYY-MM-DD"></td>
+          <td>Date:</td><td><input type="text" id="datePicker" name="eventDate" placeholder="YYYY-MM-DD"></td>
+          <div >
+
+          </div>
         </tr>
         <tr>
           <td>Time:</td>
           <td>
             <select class="" name="eventTime">
-              <option value="00:00">00:00</option>
+              {% for time_key, timeval in time_list %}
+              <option value="{{ timeval }}">{{ timeval }}</option>
+              {% endfor %}
+              <!-- <option value="00:00">00:00</option>
               <option value="01:00">01:00</option>
               <option value="02:00">02:00</option>
               <option value="03:00">03:00</option>
@@ -89,7 +129,7 @@
               <option value="20:00">20:00</option>
               <option value="21:00">21:00</option>
               <option value="22:00">22:00</option>
-              <option value="23:00">23:00</option>
+              <option value="23:00">23:00</option> -->
             </select>
           </td>
         </tr>

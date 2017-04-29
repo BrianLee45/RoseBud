@@ -9,10 +9,10 @@ body {
 
 main {
   margin: 25px auto;
-  width: 700px;
+  width: 650px;
   background-color: #ff9f71;
   border-radius: 20px;
-  padding: 15px;
+  padding: 25px 25px;
 }
 
 header {
@@ -34,7 +34,13 @@ header h4 {
   margin-left: 20px;
 }
 
-.flashes {
+table, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 3px;
+}
+
+.flash {
   margin: 10px 25px;
   background-color: yellow;
 }

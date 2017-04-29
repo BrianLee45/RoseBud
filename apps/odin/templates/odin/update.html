@@ -2,21 +2,28 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>My Appointments Home</title>
+  <title>Edit My Appointments</title>
   {% load staticfiles %}
   <link rel="stylesheet" href=" {% static 'odin/css/master.css' %} ">
-  <!-- <link rel="stylesheet" href="../static/css/master.css"> -->
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $("#datePicker").datepicker({
+        dateFormat: "yy-mm-dd"
+      });
+    });
+
+  </script>
+
 </head>
 <body>
   <main>
     <header>
-      {% if users %}
-      {% for user in users %}
-      <h1>Welcome {{ user.first_name }}</h1> <!-- Need Username -->
-      {% endfor %}
-      {% endif %}
+      <h1>Edit Appointment</h1> <!-- Need Username -->
       <h4><a href="{% url 'odin:home' %}">Dashboard</a></h4>
-      <h4><a href="">Log Out</a></h4>
+      <h4><a href="{% url 'loginReg:logout' %}">Log Out</a></h4>
     </header>
     {% if messages %}
       {% for message in messages %}
@@ -24,31 +31,38 @@
       {% endfor %}
     {% endif %}
     <section id="currentAppts">
-      <h2>Create an Event</h2>
-      <form class="" action="{% url 'odin:create' %}" method="post">
+      <!-- <h2>Create an Event</h2> -->
+      {% if event and status_list %}
+      <form class="" action="{% url 'odin:doUpdate' event.id %}" method="post">
         {% csrf_token %}
       <table>
         <tr>
-          <td>Task Name:</td><td><input type="text" name="task" placeholder="Appointment name"></td>
+          <td>Task Name:</td><td><input type="text" name="task" value="{{ event.task }}"></td>
         </tr>
         <tr>
           <td>Status:</td>
           <td>
             <select class="" name="status">
-              <option value="DONE">Done</option>
+              {% for status_type, status in status_list %}
+              <option value="{{ status }}" {% if event.status == status %}selected{% endif %}>{{ status }}</option>
+              {% endfor %}
+              <!-- <option value="DONE">Done</option>
               <option value="MISSED">Missed</option>
-              <option value="PENDING">Pending</option>
+              <option value="PENDING">Pending</option> -->
             </select>
           </td>
         </tr>
         <tr>
-          <td>Date:</td><td><input type="text" name="eventDate" placeholder="MM/DD/YYYY"></td>
+          <td>Date:</td><td><input type="text" id="datePicker" name="eventDate" value="{{ event.eventDate|date:"Y-m-d" }}"></td>
         </tr>
         <tr>
-          <td>Time:</td>
+          <td>Time: {{ event.eventTime|time:"H:i" }}</td>
           <td>
             <select class="" name="eventTime">
-              <option value="01:00">01:00</option>
+              {% for time_key, timeval in time_list %}
+              <option value="{{ timeval }}" {% if event.eventTime == timeval %}selected{% endif %}>{{ timeval }}</option>
+              {% endfor %}
+              <!-- <option value="01:00">01:00</option>
               <option value="02:00">02:00</option>
               <option value="03:00">03:00</option>
               <option value="04:00">04:00</option>
@@ -71,14 +85,15 @@
               <option value="21:00">21:00</option>
               <option value="22:00">22:00</option>
               <option value="23:00">23:00</option>
-              <option value="24:00">24:00</option>
+              <option value="24:00">24:00</option> -->
             </select>
           </td>
         </tr>
         <tr>
           <td></td>
-          <td><input type="submit" name="" value="Update"></td>
+          <td><input type="submit" name="" value="Update"><button type="button" name="button" onclick="window.location.href='{% url 'odin:home' %}'">Cancel</button></td>
         </tr>
+        {% endif %}
       </table>
       </form>
       {% if reviews %}
@@ -90,10 +105,6 @@
           <p>Posted: {{review.created_at}}</p>
         {% endfor %}
       {% endif %}
-
-    </section>
-    <section id="futureAppts">
-      <h2>Your Other Appointments</h2>
 
     </section>
   </main>
